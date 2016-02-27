@@ -17,6 +17,13 @@ How to contribute?
 - `git push` You'll be prompted for username and password for your github.
 - Once you've pushed the changes on your fork, you can create a pull request on Github to merge the changes.
 
+Milestones
+==========
+- [ ] Project Proposal.
+- [ ] I/O and Psuedocode.
+- [ ] Code kernels for implementations discussed.
+- [ ] Compare and report results.
+- [ ] Develop a real-time graphical interface for algorithm visualization.
 
 References
 ==========
