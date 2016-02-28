@@ -25,8 +25,8 @@
 #include "kernels.cuh"
 
 // includes, utilities
-#include "util/util_error.cuh"
-#include "util/util_io.cuh"
+#include "util/error_utils.cuh"
+#include "util/io_utils.cuh"
 
 
 int main(int argc, char** argv) {
