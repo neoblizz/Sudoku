@@ -50,3 +50,8 @@ inline void gpuAssert(cudaError_t code, const char *file,
     fprintf(stderr, "Usage: %s n -{gfx,txt} filename.txt\n", argv[0]);
     exit(1);
  }
+
+ void overFilename(char ** argv) {
+    fprintf(stderr, "Overflow: Filename %s is too long.", argv[3]);
+    exit(1);
+ }

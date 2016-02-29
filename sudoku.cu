@@ -30,7 +30,7 @@
 
 
 int main(int argc, char** argv) {
-
-    input(argc, argv);
+    CommandLineArgs * build = new CommandLineArgs;
+    input(argc, argv, build);
 
 }

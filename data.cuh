@@ -8,21 +8,25 @@
  *
  * @brief Stores data types to be used.
  */
+#define PUZZLE_SIZE 9
 
-struct CMD {
-  Size size;
-  bool gfx_output;
-  Puzzle * unsolved;
-}; /* Stores command line arguments */
+/*
+ * Locked = -1;
+ * Open = 0;
+ * Guessed = 1;
+ */
+typedef int Lock;
+typedef int vAnswer;
+typedef int vPossible;
 
 struct Square {
-  int value; 		//not needed if we always check len(possValues)
-					//else set to 0 for all Squares and set when lock
-					//so we could really just skip the lock if just check =0
+  vAnswer value;
+	Lock isLocked;
+	vPossible possValues[PUZZLE_SIZE];
+} Puzzle; /* Stores per square value for a puzzle */
 
-	bool isLocked,		//may want to replace with int, so we can
-					//guess and keep track of what is locked/guessed
-
-	int possValues[9]	//for keeping track of what values this Square could be
-					//based on other locked Squares in local row/col/block
-};
+struct CommandLineArgs {
+  Size size;
+  bool graphics;
+  Puzzle unsolved[PUZZLE_SIZE*PUZZLE_SIZE];
+}; /* Stores command line arguments */
