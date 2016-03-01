@@ -16,6 +16,9 @@
 #include <iostream>
 #include <fstream>
 
+#include "error_utils.cuh"
+#include "../data.cuh"
+
 namespace std;
 
 /**
