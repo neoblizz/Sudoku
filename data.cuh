@@ -13,7 +13,7 @@
 /*
  * Locked = -1;
  * Open = 0;
- * Guessed = 1;
+ * Guessed = 1-9;
  */
 typedef int Lock;
 typedef int vAnswer;

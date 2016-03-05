@@ -54,6 +54,9 @@ void KernelManager(Size n, Puzzle * h_unsolved, bool o_graphics) {
   ERROR_CHECK( cudaMemcpy(d_unsolved, h_unsolved, memsize,
                           cudaMemcpyHostToDevice) );
 
+  Puzzle * d_solved;
+  ERROR_CHECK( cudaMalloc((void**) &d_solved, memsize) );
+
   float elapsedTime;
   cudaEventRecord(start, 0);
 
@@ -66,8 +69,9 @@ void KernelManager(Size n, Puzzle * h_unsolved, bool o_graphics) {
   cudaEventSynchronize(stop);
   cudaEventElapsedTime(&elapsedTime, start, stop);
 
-  Puzzle * d_solved;
-  ERROR_CHECK( cudaMalloc((void**) &d_solved, memsize) );
+  Puzzle * h_solved = ;
+  ERROR_CHECK( cudaMemcpy(h_solved, d_solved, memsize,
+                          cudaMemcpyDeviceToHost) );
 
   /* Destroy CUDA event */
   cudaEventDestroy(start);
