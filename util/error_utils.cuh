@@ -1,3 +1,6 @@
+#ifndef ERROR_UTILS_H
+#define ERROR_UTILS_H
+
 // ----------------------------------------------------------------
 // Sudoku -- Puzzle Solver on GPU using CUDA
 // ----------------------------------------------------------------
@@ -55,3 +58,5 @@ inline void gpuAssert(cudaError_t code, const char *file,
     fprintf(stderr, "Overflow: Filename %s is too long.", argv[3]);
     exit(1);
  }
+
+ #endif

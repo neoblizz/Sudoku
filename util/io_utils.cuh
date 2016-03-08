@@ -1,3 +1,6 @@
+#ifndef IO_UTILS_H
+#define IO_UTILS_H
+
 // ----------------------------------------------------------------
 // Sudoku -- Puzzle Solver on GPU using CUDA
 // ----------------------------------------------------------------
@@ -19,7 +22,61 @@
 #include "error_utils.cuh"
 #include "../data.cuh"
 
-namespace std;
+using namespace std;
+
+/**
+ * @brief Displays the puzzle at any state.
+ * @param[in] description       Description of what you're displaying.
+ * @param[in] n                 Size of the puzzle.
+ * @param[in] graphics          GFX or TXT output?
+ * @param[in] display           Actual puzzle to display, format:
+ *          -------------------------------------
+ *          | v | v | v | v | v | v | v | v | v |
+ *          -------------------------------------
+ *          | v | v | v | v | v | v | v | v | v |
+ *          -------------------------------------
+ *          | v | v | v | v | v | v | v | v | v |
+ *          -------------------------------------
+ *          | v | v | v | v | v | v | v | v | v |
+ *          -------------------------------------
+ *          | v | v | v | v | v | v | v | v | v |
+ *          -------------------------------------
+ *          | v | v | v | v | v | v | v | v | v |
+ *          -------------------------------------
+ *          | v | v | v | v | v | v | v | v | v |
+ *          -------------------------------------
+ *          | v | v | v | v | v | v | v | v | v |
+ *          -------------------------------------
+ *          | v | v | v | v | v | v | v | v | v |
+ *          -------------------------------------
+ */
+void output(const char * description, int n, bool graphics, Square * display) {
+
+  cout << description << endl;
+  cout << "-------------------------------------" << endl;
+  cout << "| ";
+
+  int k = 0;
+  while (k < n*n) {
+
+    if (display[k].isLocked == -1) {
+        cout << (int) display[k].value;
+    } else if (display[k].isLocked == 0){
+        cout << "x";
+    }
+    cout << " | ";
+
+    if (k == 8 || k == 17 || k == 26 || k == 35 ||
+        k == 44 || k == 53 || k == 62 || k == 71 || k == 80) {
+          cout << "" << endl;
+          cout << "-------------------------------------" << endl;
+          if (k != 80) { cout << "| "; }
+    }
+    k++;
+
+  }
+
+}
 
 /**
  * @brief Parses the commandline input and stores in CMD struct
@@ -35,10 +92,9 @@ void input(int argc, char** argv, CommandLineArgs * build) {
   // Set size n (supports 9x9)
   int n = atoi(argv[1]);
   (*build).size = n;
+  // cout << (*build).size << endl;
 
   // Check output method.
-  bool graphics = false;
-
   if (!strcmp(argv[2], "-gfx")) {
       (*build).graphics = true;
   } else if (!strcmp(argv[2], "-txt")) {
@@ -47,30 +103,41 @@ void input(int argc, char** argv, CommandLineArgs * build) {
     usage(argv);
   }
 
+  // cout << (*build).graphics << endl;
+
   // Set filename
   char filename[1024];
 
-  if (sizeof filename >= length) { strcpy (filename, argv[3]); }
+  if (sizeof(filename) >= 1024) { strcpy (filename, argv[3]); }
   else { overFilename(argv); }
 
-  const char * token = "x";
+  //cout << filename << endl;
+
+  char token = 'x';
   ifstream is(filename);
 
   char problem;
   int i = 0;
   while(is.get(problem) && (i < n*n)) {
 
-    if (strncmp(problem, token, sizeof(graph_token))) {
-        (*build).unsolved[i].value = atoi(problem);
-        (*build).unsolved[i].isLocked = -1;
+    if (strncmp(&problem, &token, sizeof(token))) {
+        (*build).Puzzle[i].value = problem - 48; // atoi(&problem);
+        // cout << (*build).Puzzle[i].value;
+        (*build).Puzzle[i].isLocked = -1;
     } else {
-        (*build).unsolved[i].isLocked = 0;
+        (*build).Puzzle[i].isLocked = 0;
     }
 
     i++;
   }
 
+  // cout << i << endl;
+
   is.close();
+  const char * unsolved = "/********** Input Puzzle **********/";
+  output(unsolved, (*build).size, (*build).graphics, (*build).Puzzle);
   return;
 
 }
+
+#endif
