@@ -18,9 +18,6 @@ How to contribute?
 - Compile `nvcc -std=c++11 -o sudoku sudoku.cu`
 - Run `./sudoku 9 -txt Easy_Puzzle.txt`
 
-- Compile `nvcc -std=c++11 -o sudoku sudoku.cu`
-- Run `./sudoku 9 -txt Easy_Puzzle.txt`
-
 Milestones
 ==========
 - [x] Project Proposal.
@@ -42,4 +39,3 @@ References
 [5] D. Karaboga and B. Akay. Erciyes. “Artificial Bee Colony (ABC), Harmony Search and Bees Algorithms on Numerical Optimization”<br>
 [6] QT. Web. http://www.qt.io<br>
 [7] GTK. Web. http://www.gtk.org<br>
-
