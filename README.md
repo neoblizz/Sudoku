@@ -4,7 +4,6 @@ Sudoku is a logic-based number puzzle with the objective of filling an entire 9x
 
 While many algorithms exist for human and computer solvers alike, a particularly unique approach to think about when solving Sudoku puzzles on a GPUs is the genetic algorithm model, which is an algorithm based on the theory of evolution. The main idea is to represent a single chromosome as a possible solution for the problem, then randomly swap cells within each block (simulating genetic mutation) to generate several new possible solutions for the problem. A  control unit called the evaluation function then evaluates and assigns ratings to these possible solutions, and the solution with the best ratings is chosen as the parent for the next generation. With continued generation of these solutions and reevaluations, the algorithm eventually converges to an absolute truth. Genetic algorithm is nondeterministic algorithm, it’s an interesting algorithm for solving puzzle problems. Because this algorithm is highly compute intensive, the GPU is a clear choice for development to highlight the efficiency of the genetic algorithm model and to solve interesting puzzles like sudoku!
 
-
 How to contribute?
 ==================
 - `fork` using GitHub; https://github.com/neoblizz/Sudoku
@@ -16,6 +15,9 @@ How to contribute?
 - `git commit -m "comment here"`
 - `git push` You'll be prompted for username and password for your github.
 - Once you've pushed the changes on your fork, you can create a pull request on Github to merge the changes.
+
+- Compile `nvcc -std=c++11 -o sudoku sudoku.cu`
+- Run `./sudoku 9 -txt Easy_Puzzle.txt`
 
 Milestones
 ==========

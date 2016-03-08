@@ -9,8 +9,6 @@
  * @brief main sudoku file to init and execute
  */
 
-#pragma once
-
 // includes, system
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,7 +20,7 @@
 #include <cuda_runtime.h>
 
 // includes, kernels
-#include "kernels.cuh"
+// #include "kernels.cuh"
 
 // includes, utilities
 #include "util/error_utils.cuh"
@@ -35,11 +33,11 @@ int main(int argc, char** argv) {
     /* Gets arguments from command line and puzzle from a file */
     CommandLineArgs * build = new CommandLineArgs;
     input(argc, argv, build);
-    KernelManager((*build).size, &(*build).unsolved, (*build).graphpics);
+    /* KernelManager((*build).size, &(*build).unsolved, (*build).graphpics); */
 
 }
 
-void KernelManager(Size n, Puzzle * h_unsolved, bool o_graphics) {
+void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
 
   /* CUDA event setup */
   cudaEvent_t start, stop;
@@ -47,12 +45,15 @@ void KernelManager(Size n, Puzzle * h_unsolved, bool o_graphics) {
   cudaEventCreate(&stop);
 
   /* Memory Allocations */
-  memsize = sizeof(Puzzle) * (*build).size * (*build).size;
+  int memsize = sizeof(Square) * n * n;
 
-  Puzzle * d_unsolved;
+  Square * d_unsolved;
   ERROR_CHECK( cudaMalloc((void**) &d_unsolved, memsize) );
   ERROR_CHECK( cudaMemcpy(d_unsolved, h_unsolved, memsize,
                           cudaMemcpyHostToDevice) );
+
+  Square * d_solved;
+  ERROR_CHECK( cudaMalloc((void**) &d_solved, memsize) );
 
   float elapsedTime;
   cudaEventRecord(start, 0);
@@ -66,8 +67,9 @@ void KernelManager(Size n, Puzzle * h_unsolved, bool o_graphics) {
   cudaEventSynchronize(stop);
   cudaEventElapsedTime(&elapsedTime, start, stop);
 
-  Puzzle * d_solved;
-  ERROR_CHECK( cudaMalloc((void**) &d_solved, memsize) );
+  Square * h_solved = (Square *) malloc(memsize);
+  ERROR_CHECK( cudaMemcpy(h_solved, d_solved, memsize,
+                          cudaMemcpyDeviceToHost) );
 
   /* Destroy CUDA event */
   cudaEventDestroy(start);
