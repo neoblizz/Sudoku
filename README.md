@@ -15,16 +15,22 @@ How to contribute?
 - `git commit -m "comment here"`
 - `git push` You'll be prompted for username and password for your github.
 - Once you've pushed the changes on your fork, you can create a pull request on Github to merge the changes.
+- Compile `nvcc -std=c++11 -o sudoku sudoku.cu`
+- Run `./sudoku 9 -txt Easy_Puzzle.txt`
 
 - Compile `nvcc -std=c++11 -o sudoku sudoku.cu`
 - Run `./sudoku 9 -txt Easy_Puzzle.txt`
 
 Milestones
 ==========
-- [ ] Project Proposal.
-- [ ] I/O and Psuedocode.
+- [x] Project Proposal.
+
+- [x] I/O and Psuedocode.
+
 - [ ] Code kernels for implementations discussed.
+
 - [ ] Compare and report results.
+
 - [ ] Develop a real-time graphical interface for algorithm visualization.
 
 References
@@ -36,3 +42,4 @@ References
 [5] D. Karaboga and B. Akay. Erciyes. “Artificial Bee Colony (ABC), Harmony Search and Bees Algorithms on Numerical Optimization”<br>
 [6] QT. Web. http://www.qt.io<br>
 [7] GTK. Web. http://www.gtk.org<br>
+
