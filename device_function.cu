@@ -1,7 +1,17 @@
+// ----------------------------------------------------------------
+// Sudoku -- Puzzle Solver on GPU using CUDA
+// ----------------------------------------------------------------
 
-//check if a new number can be placed at current box, row, column
-//
-#include data.cuh
+/**
+ * @file
+ * device_function.cu
+ *
+ * @brief File for all our device functions.
+ */
+
+#pragma once
+
+#include "data.cuh"
 
 __device__
 bool validNum(vPossible newNum, int* box, int* row, int* col){
