@@ -5,8 +5,8 @@
 
 __device__
 bool validNum(vPossible newNum, int* box, int* row, int* col){
-	   
-	for(int i =0; i <= 9; i++){
+
+	for(int i =0; i < 9; i++){
 		if(newNum == squre[i] || newNum == row[i] || newNum == col[i]){
 			return false;
 		}
@@ -21,7 +21,7 @@ bool validNum(vPossible newNum, int* box, int* row, int* col){
 //return -1 if it doens't exist in the possible num array
 __device__
 int isPossibleNum(vPossible newNum, vPossible * possibleNum){
-	for(int i = 0; i <=9; i++){
+	for(int i = 0; i < 9; i++){
 		if(possibleNum[i] != '\0'){
 			if(possibleNum == newNum){
 				return i;
@@ -45,7 +45,6 @@ void popoff(vPossible num, vPossible *possibleNum){
 				break;
 			}
 		}
-
 	}
 
 }
