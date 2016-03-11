@@ -64,7 +64,7 @@ void popoff(vPossible num, vPossible *possibleNum){
 			}
 
 			//if array was previously 9 elements, the last element should now be \0
-			if(i=8) {
+			if(i==8) {
 				possibleNum[i] = '\0';
 				break;
 			}
