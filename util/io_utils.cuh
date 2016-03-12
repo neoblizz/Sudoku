@@ -125,6 +125,7 @@ void input(int argc, char** argv, CommandLineArgs * build) {
         // cout << (*build).Puzzle[i].value;
         (*build).Puzzle[i].isLocked = -1;
     } else {
+        (*build).Puzzle[i].possValues = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         (*build).Puzzle[i].isLocked = 0;
     }
 
