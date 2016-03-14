@@ -19,23 +19,14 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-// includes, kernels
-#include "kernels.cuh"
-
 // includes, utilities
 #include "util/error_utils.cuh"
 #include "util/io_utils.cuh"
 #include "data.cuh"
 
-
-int main(int argc, char** argv) {
-
-    /* Gets arguments from command line and puzzle from a file */
-    CommandLineArgs * build = new CommandLineArgs;
-    input(argc, argv, build);
-    KernelManager((*build).size, &(*build).unsolved, (*build).graphpics);
-
-}
+// includes, kernels
+// #include "kernels.cuh"
+#include "beecolony.cuh"
 
 void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
 
@@ -58,10 +49,7 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   float elapsedTime;
   cudaEventRecord(start, 0);
 
-  // TODO: Kernel execution
-  // TODO: All of them can go one by one,
-  // TODO: we'll just need to reset event record,
-  // TODO: for multiple timing/performance measurements.
+  ArtificialBeeColony (d_unsolved, d_solved, n);
 
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
@@ -76,9 +64,20 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   cudaEventDestroy(stop);
 
   // TODO: Terminal Output will go here.
+  const char * finished = "/********** Output Puzzle **********/";
+  output(finished, n, false, h_solved);
 
   /* Free Memory Allocations */
   free(h_unsolved);
   ERROR_CHECK( cudaFree(d_unsolved) );
   ERROR_CHECK( cudaFree(d_solved) );
+}
+
+int main(int argc, char** argv) {
+
+    /* Gets arguments from command line and puzzle from a file */
+    CommandLineArgs * build = new CommandLineArgs;
+    input(argc, argv, build);
+    KernelManager((*build).size, (*build).Puzzle, (*build).graphics);
+
 }
