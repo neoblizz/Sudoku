@@ -42,6 +42,8 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   /* IMPORTANT: PLEASE ADD THIS IN YOUR KERNEL MANAGER FUNCTION */
   /*ERROR_CHECK( cudaMemcpy(d_unsolved, h_unsolved, memsize,
                           cudaMemcpyHostToDevice) );*/
+ /* IMPORTANT: END! */
+
 
   Square * d_solved;
   ERROR_CHECK( cudaMalloc((void**) &d_solved, memsize) );
