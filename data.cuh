@@ -23,9 +23,9 @@ typedef int vAnswer;
 typedef int vPossible;
 
 struct Square {
-  vAnswer value;
-	Lock isLocked;
-	vPossible possValues[PUZZLE_SIZE];
+  int value;
+	int isLocked;
+	int possValues[PUZZLE_SIZE];
 }; /* Stores per square value for a puzzle */
 
 struct CommandLineArgs {

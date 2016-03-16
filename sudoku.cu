@@ -40,16 +40,16 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
 
   Square * d_unsolved;
   ERROR_CHECK( cudaMalloc((void**) &d_unsolved, memsize) );
-  ERROR_CHECK( cudaMemcpy(d_unsolved, h_unsolved, memsize,
-                          cudaMemcpyHostToDevice) );
+  /* IMPORTANT: PLEASE ADD THIS IN YOUR KERNEL MANAGER FUNCTION */
+  /*ERROR_CHECK( cudaMemcpy(d_unsolved, h_unsolved, memsize,
+                          cudaMemcpyHostToDevice) );*/
 
   Square * d_solved;
   ERROR_CHECK( cudaMalloc((void**) &d_solved, memsize) );
 
   float elapsedTime;
   cudaEventRecord(start, 0);
-
-  ArtificialBeeColony (d_unsolved, d_solved, n);
+  ArtificialBeeColony (h_unsolved, d_unsolved, d_solved, n);
 
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
@@ -64,8 +64,13 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   cudaEventDestroy(stop);
 
   // TODO: Terminal Output will go here.
-  const char * finished = "/********** Output Puzzle **********/";
-  output(finished, n, false, h_solved);
+  const char * finished = "/********** Bee Colony (C) **********/";
+  output(finished, "-bee", n, false, h_solved);
+  const char* statistics = "/******* Statistics (Begin) ********/";
+  printf("%s\n", statistics);
+  printf("Elapsed Time: %f (ms)\n", elapsedTime);
+  const char* statistics_end = "/******** Statistics (End) *********/";
+  printf("%s\n", statistics_end);
 
   /* Free Memory Allocations */
   free(h_unsolved);

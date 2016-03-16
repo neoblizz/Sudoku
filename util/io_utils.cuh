@@ -50,7 +50,8 @@ using namespace std;
  *          | v | v | v | v | v | v | v | v | v |
  *          -------------------------------------
  */
-void output(const char * description, int n, bool graphics, Square * display) {
+void output(const char * description, const char * algorithm,
+            int n, bool graphics, Square * display) {
 
   cout << description << endl;
   cout << "-------------------------------------" << endl;
@@ -61,8 +62,10 @@ void output(const char * description, int n, bool graphics, Square * display) {
 
     if (display[k].isLocked == -1) {
         cout << (int) display[k].value;
-    } else if (display[k].isLocked == 0){
+    } else if (display[k].isLocked == 0 && strcmp(algorithm, "-bee")) {
         cout << "x";
+    } else if (display[k].isLocked == 0 && !strcmp(algorithm, "-bee")) {
+        cout << (int) display[k].value;
     }
     cout << " | ";
 
@@ -128,6 +131,7 @@ void input(int argc, char** argv, CommandLineArgs * build) {
         for (int j = 0; j < 9; j++) {
             (*build).Puzzle[i].possValues[j] = j+1;
         }
+        (*build).Puzzle[i].value = 0;
         (*build).Puzzle[i].isLocked = 0;
     }
 
@@ -138,7 +142,7 @@ void input(int argc, char** argv, CommandLineArgs * build) {
 
   is.close();
   const char * unsolved = "/********** Input Puzzle **********/";
-  output(unsolved, (*build).size, (*build).graphics, (*build).Puzzle);
+  output(unsolved, "-in", (*build).size, (*build).graphics, (*build).Puzzle);
   return;
 
 }
