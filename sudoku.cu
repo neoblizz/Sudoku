@@ -25,7 +25,6 @@
 #include "data.cuh"
 
 // includes, kernels
-// #include "kernels.cuh"
 #include "beecolony.cuh"
 
 void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
