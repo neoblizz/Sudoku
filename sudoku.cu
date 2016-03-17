@@ -65,8 +65,14 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   cudaEventDestroy(stop);
 
   // TODO: Terminal Output will go here.
-  const char * finished = "/********** Bee Colony (C) **********/";
-  output(finished, "-bee", n, false, h_solved);
+  const char * alg = "-bee";
+
+  if (!strcmp(alg, "-bee")) {
+    CSRtoCSC(h_solved, n);
+    const char * finished = "/********** Bee Colony (C) **********/";
+    output(finished, alg, n, false, h_solved);
+  }
+
   const char* statistics = "/******* Statistics (Begin) ********/";
   printf("%s\n", statistics);
   printf("Elapsed Time: %f (ms)\n", elapsedTime);

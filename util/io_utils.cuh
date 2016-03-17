@@ -22,6 +22,9 @@
 #include "error_utils.cuh"
 #include "../data.cuh"
 
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 using namespace std;
 
 /**
@@ -61,7 +64,7 @@ void output(const char * description, const char * algorithm,
   while (k < n*n) {
 
     if (display[k].isLocked == -1) {
-        cout << (int) display[k].value;
+        printf(ANSI_COLOR_RED "%d" ANSI_COLOR_RESET, display[k].value);
     } else if (display[k].isLocked == 0 && strcmp(algorithm, "-bee")) {
         cout << "x";
     } else if (display[k].isLocked == 0 && !strcmp(algorithm, "-bee")) {
