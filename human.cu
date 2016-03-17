@@ -162,6 +162,8 @@ __global__ void (Square* d_board, int n) {
 
 		}
 
+__syncthreads();
+
 	// copy back from shared mem to global mem
 	if (threadIdx.x == 0) {
 		for (i=0; i<(n*n); i++) {

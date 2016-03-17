@@ -28,7 +28,8 @@ void getRow(int tid, Square* board, Square* localRow) {
 
 }
 
-Square* getCol(int tid, Square* board, Square* localCol) {
+__device__
+void getCol(int tid, Square* board, Square* localCol) {
 
 	int colNum = tid%9; // also first element of the column
 	//Square output[9];
@@ -47,8 +48,8 @@ Square* getCol(int tid, Square* board, Square* localCol) {
 
 }
 
-
-Square* getBlock(int tid, Square* board, Square* localBlock) {
+__device__
+void getBlock(int tid, Square* board, Square* localBlock) {
 
 	int blockRow; // tells us if it's in the top/mid/bot
 	
@@ -80,9 +81,9 @@ Square* getBlock(int tid, Square* board, Square* localBlock) {
 	int starter = blockRow*27 + blockCol*3;
 
 	localBlock[9] =
-		(board[starter], board[starter+1], board[starter+2],
+		{board[starter], board[starter+1], board[starter+2],
 		board[starter+9], board[starter+10], board[starter+11],
-		board[starter+18], board[starter+19], board[starter+20]);	
+		board[starter+18], board[starter+19], board[starter+20]};	
 
 	//return output;
 
@@ -130,22 +131,26 @@ __global__ void populate(Square* board) {
 
 		// use popoff to remove invalid values from the possValues array
 
-		
-		for (i=1; i<10; i++) {
+		int cur;
+		for (i=0; i<9; i++) {
+			cur = s_board[tid].possValues[i];
+			
+			if (cur==NULL)
+				break;
 
-			// check if another Square in the row/col/block makes i
+			// check if another Square in the row/col/block makes cur
 				// invalid for the current Square
-			if (!validNum(i, localBlockValues, localRowValues,
+			if (!validNum(cur, localBlockValues, localRowValues,
 					localColValues)) {
 
 				//if there is a conflict, pop it off
-					//isPossibleNum checks if it's even in the
-					//array of possValues
+				//isPossibleNum checks if it's even in the
+				//array of possValues
 				popoff(i, s_board[i].possValues);
 
 			}
-		}	
 
+		}
 	}
 
 	__syncthreads();
