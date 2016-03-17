@@ -36,6 +36,43 @@ using namespace std;
  */
 
 /**
+ * @brief Converts a 1D array to 2D array.
+ *
+ */
+void ONEDtoTWOD (Square h_sudoku[][9], Square * h_unsolved, int n) {
+ for (int x = 0; x < n; x++) {
+   for (int y = 0; y < n; y++) {
+       h_sudoku[x][y].value = h_unsolved[x + n * y].value;
+       h_sudoku[x][y].isLocked = h_unsolved[x + n * y].isLocked;
+   }
+ }
+}
+
+/**
+ * @brief Converts row major order to column major.
+ *
+ */
+__host__ __device__ void CSRtoCSC (Square * sudoku, int n) {
+
+    Square Swap[81];
+
+    int limit = 0;
+    for (int i = 0; i < 9; i++) {
+     for (int j = 0; j < 9; j++) {
+       Swap[i + n * j].value = sudoku[limit].value;
+       Swap[i + n * j].isLocked = sudoku[limit].isLocked;
+       limit++;
+     }
+    }
+
+    for (int k = 0; k < 81; k++) {
+       sudoku[k].value = Swap[k].value;
+       sudoku[k].isLocked = Swap[k].isLocked;
+    }
+
+}
+
+/**
  * @brief Random number generator across cores for cuda.
  */
 __global__ void cuRandomNumberGenerator (curandState *state) {
@@ -94,6 +131,11 @@ __host__ __device__ int hiveQuality (Square sudoku[][9]) {
     }
 
   	return 162 - q_hive;
+}
+
+
+__global__ void toCSC (Square * sudoku, int n) {
+    CSRtoCSC (sudoku, n);
 }
 
 __global__ void BeeColony (Square * d_unsolved, Square * d_solved,
@@ -172,39 +214,41 @@ __global__ void BeeColony (Square * d_unsolved, Square * d_solved,
   }
 
   for(int m = 0; m < 9; m++) {
-		for(int n = 0; n < 9; n++) {
-      // d_sub[(m + 9 * n) + (block * (n * n))] = sudoku[m][n];
+		for(int y = 0; y < 9; y++) {
+      // d_sub[(m + y) + (block * (n * n))].value = sudoku[m][y].value;
+      // d_sub[(m + y) + (block * (n * n))].isLocked = sudoku[m][y].isLocked;
+
       switch (block) {
         case 0:
-          d_solved1[m + 9 * n] = sudoku[m][n];
+          d_solved1[m + 9 * y] = sudoku[m][y];
         case 1:
-          d_solved2[m + 9 * n] = sudoku[m][n];
+          d_solved2[m + 9 * y] = sudoku[m][y];
         case 2:
-          d_solved3[m + 9 * n] = sudoku[m][n];
+          d_solved3[m + 9 * y] = sudoku[m][y];
         case 3:
-          d_solved4[m + 9 * n] = sudoku[m][n];
+          d_solved4[m + 9 * y] = sudoku[m][y];
         case 4:
-          d_solved5[m + 9 * n] = sudoku[m][n];
+          d_solved5[m + 9 * y] = sudoku[m][y];
         case 5:
-          d_solved6[m + 9 * n] = sudoku[m][n];
+          d_solved6[m + 9 * y] = sudoku[m][y];
         case 6:
-          d_solved7[m + 9 * n] = sudoku[m][n];
+          d_solved7[m + 9 * y] = sudoku[m][y];
         case 7:
-          d_solved8[m + 9 * n] = sudoku[m][n];
+          d_solved8[m + 9 * y] = sudoku[m][y];
         case 8:
-          d_solved9[m + 9 * n] = sudoku[m][n];
+          d_solved9[m + 9 * y] = sudoku[m][y];
         case 9:
-          d_solved10[m + 9 * n] = sudoku[m][n];
+          d_solved10[m + 9 * y] = sudoku[m][y];
         case 10:
-          d_solved11[m + 9 * n] = sudoku[m][n];
+          d_solved11[m + 9 * y] = sudoku[m][y];
         case 11:
-          d_solved12[m + 9 * n] = sudoku[m][n];
+          d_solved12[m + 9 * y] = sudoku[m][y];
         case 12:
-          d_solved13[m + 9 * n] = sudoku[m][n];
+          d_solved13[m + 9 * y] = sudoku[m][y];
         case 13:
-          d_solved14[m + 9 * n] = sudoku[m][n];
+          d_solved14[m + 9 * y] = sudoku[m][y];
         case 14:
-          d_solved15[m + 9 * n] = sudoku[m][n];
+          d_solved15[m + 9 * y] = sudoku[m][y];
         default:
           break;
       }
@@ -254,40 +298,6 @@ void restart (Square * h_unsolved, Square * d_unsolved, int memsize) {
 
   ERROR_CHECK( cudaMemcpy(d_unsolved, h_unsolved, memsize,
                           cudaMemcpyHostToDevice));
-
-}
-
-/**
- * @brief Converts a 1D array to 2D array.
- *
- */
-void ONEDtoTWOD (Square h_sudoku[][9], Square * h_unsolved, int n) {
-  for (int x = 0; x < n; x++) {
-    for (int y = 0; y < n; y++) {
-        h_sudoku[x][y].value = h_unsolved[x + n * y].value;
-        h_sudoku[x][y].isLocked = h_unsolved[x + n * y].isLocked;
-    }
-  }
-}
-
-void CSRtoCSC (Square * h_unsolved, int n) {
-
-  Square * Swap = (Square *) malloc(sizeof(Square) * n * n);
-  int limit = 0;
-  for (int i = 0; i < 9; i++) {
-    for (int j = 0; j < 9; j++) {
-      Swap[i + n * j].value = h_unsolved[limit].value;
-      Swap[i + n * j].isLocked = h_unsolved[limit].isLocked;
-      limit++;
-    }
-  }
-
-  for (int k = 0; k < 81; k++) {
-      h_unsolved[k].value = Swap[k].value;
-      h_unsolved[k].isLocked = Swap[k].isLocked;
-  }
-
-  // free(Swap);
 
 }
 
@@ -416,7 +426,6 @@ void ArtificialBeeColony (Square * h_unsolved, Square * d_unsolved,
   int minimum, min_index;
 
   Square h_sudoku[9][9];
-
   CSRtoCSC(h_unsolved, n);
   init_ArtificalBeeColony(h_unsolved, n);
 
@@ -459,9 +468,15 @@ void ArtificialBeeColony (Square * h_unsolved, Square * d_unsolved,
 
     c_hive = minimum;
 
-    /* ERROR_CHECK( cudaMemcpy(d_unsolved, d_sub+(min_index*n*n), memsize,
+    /* // TODO: Condense all the solution numbers to one giant array with ptrs.
+    ERROR_CHECK( cudaMemcpy(d_unsolved, d_sub+(min_index*n*n), memsize,
                             cudaMemcpyDeviceToDevice));
+
+    toCSC<<<1,1>>>(d_unsolved, n);
+    ERROR_CHECK( cudaPeekAtLastError() );
+    ERROR_CHECK( cudaDeviceSynchronize() );
     */
+
 
     switch (min_index) {
       case 0:
