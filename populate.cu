@@ -1,6 +1,9 @@
 #ifndef POP_H
 #define POP_H
 
+#pragma once
+
+#include "device_function.cu"
 
 // Populates the possValues array
 // Removes all values that are not possible, based on starting board
@@ -36,10 +39,10 @@ void getCol(int tid, Square* board, Square* localCol) {
 	
 	for (int i = 0; i<9; i++) {
 		localCol[i].value = board[colNum + (9*i)].value;
-		localCol[i].isLocked = board[startOfRow + i].isLocked;
+		localCol[i].isLocked = board[colNum + (9*i)].isLocked;
 	
 		for (int j=0; j<9; j++) {
-			localCol[i].possValues[j] = board[startOfCol + i].possValues[j];	
+			localCol[i].possValues[j] = board[colNum + (9*i)].possValues[j];	
 		}
 
 	}
@@ -81,9 +84,9 @@ void getBlock(int tid, Square* board, Square* localBlock) {
 	int starter = blockRow*27 + blockCol*3;
 
 	localBlock[9] =
-		{board[starter], board[starter+1], board[starter+2],
+		(board[starter], board[starter+1], board[starter+2],
 		board[starter+9], board[starter+10], board[starter+11],
-		board[starter+18], board[starter+19], board[starter+20]};	
+		board[starter+18], board[starter+19], board[starter+20]);	
 
 	//return output;
 
@@ -122,7 +125,7 @@ __global__ void populate(Square* board) {
 		int localColValues[9];
 		int localBlockValues[9];
 
-		for (i=0; i<9; i++) {
+		for (int i=0; i<9; i++) {
 			localRowValues[i] = localRow[i].value;
 			localColValues[i] = localCol[i].value;
 			localBlockValues[i] = localBlock[i].value;
@@ -132,7 +135,7 @@ __global__ void populate(Square* board) {
 		// use popoff to remove invalid values from the possValues array
 
 		int cur;
-		for (i=0; i<9; i++) {
+		for (int i=0; i<9; i++) {
 			cur = s_board[tid].possValues[i];
 			
 			if (cur==NULL)
@@ -156,7 +159,7 @@ __global__ void populate(Square* board) {
 	__syncthreads();
 
 	if (threadIdx.x == 0) {
-		for (i = 0; i<81; i++)
+		for (int i = 0; i<81; i++)
 			board[i] = s_board[i];
 	}
 
