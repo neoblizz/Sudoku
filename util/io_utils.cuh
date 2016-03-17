@@ -85,6 +85,24 @@ void output(const char * description, const char * algorithm,
 }
 
 /**
+ * @brief Displays the populate values for the board.
+ * @param[in] display           Actual puzzle to display, format:
+ *               -----
+ *   [row, col]  | v | => [1, 2, 3, 4, 5, 6, 7, 8, 9]
+ *               -----
+ */
+void debug_values(Square * display) {
+
+  for (int i = 0; i < 9; i++) {
+    printf("[%d, %d]  | v | => [", 0, i);
+    for (int j = 0; j < (sizeof(display[i].possValues)/sizeof(*display[i].possValues))); j++) {
+      printf("%d ", display[i].possValues[j]);
+    }
+    printf("]\n", );
+  }
+}
+
+/**
  * @brief Parses the commandline input and stores in CMD struct
  * @param[in] argc          Total number of arguments.
  * @param[in] argv          List of arguments.
