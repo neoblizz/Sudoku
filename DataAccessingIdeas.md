@@ -1,3 +1,4 @@
+// DATA ACC IDEA FILE
 Square board[81];
 
 // row is board[i + 9*rowOffset] through board[i+8 + 9*rowOffset]
