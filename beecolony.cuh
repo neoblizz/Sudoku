@@ -19,8 +19,8 @@
 #include "util/error_utils.cuh"
 #include "data.cuh"
 
-#define CHAINS 8
-#define CYCLES 10000       // (1<<10)
+#define CHAINS 15
+#define CYCLES (1<<20) // 1000000
 #define INIT_EFFORT 0.4
 #define EFFORT_MIN 0.001
 #define INIT_TOLERANCE 1
@@ -57,7 +57,7 @@ __global__ void cuRandomNumberGenerator (curandState *state) {
 __host__ __device__ int foodQuality (int food, Square sudoku[][9], bool rc) {
 
   int index, quality;
-  int nums[9]={1,2,3,4,5,6,7,8,9};
+  int nums[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
       quality = 0;
 
@@ -102,7 +102,11 @@ __global__ void BeeColony (Square * d_unsolved, Square * d_solved,
                            Square * d_solved1, Square * d_solved2,
                            Square * d_solved3, Square * d_solved4,
                            Square * d_solved5, Square * d_solved6,
-                           Square * d_solved7, Square * d_solved8) {
+                           Square * d_solved7, Square * d_solved8,
+                           Square * d_solved9, Square * d_solved10,
+                           Square * d_solved11, Square * d_solved12,
+                           Square * d_solved13, Square * d_solved14,
+                           Square * d_solved15) {
 
   int index = threadIdx.y + blockIdx.x * blockDim.x;
   int block = blockIdx.y + blockIdx.x * blockDim.x;
@@ -124,15 +128,12 @@ __global__ void BeeColony (Square * d_unsolved, Square * d_solved,
   int q_hive;
 
   for(int i = 0; i < CYCLES; i++) {
-    // USAGE: number = (int) curand_uniform(&state[index]);
-    // TODO: Scout to begin the process.
-    // TODO: Randomly select a block.
-    // TODO: Employed Bees
-    // TODO: Onlooker Bees
 
+    /* SCOUT BEE */
 		sub_blockx = 3 * (int) (3.0 * curand_uniform(&state[block]));
 		sub_blocky = 3 * (int) (3.0 * curand_uniform(&state[block]));
 
+    /* WORKER BEE */
     do {
 			unmask1_x = (int) 3.0 * curand_uniform(&state[block]);
 			unmask1_y = (int) 3.0 * curand_uniform(&state[block]);
@@ -150,6 +151,7 @@ __global__ void BeeColony (Square * d_unsolved, Square * d_solved,
     sudoku[sub_blockx+unmask1_x][sub_blocky+unmask1_y].value = sudoku[sub_blockx+unmask2_x][sub_blocky+unmask2_y].value;
     sudoku[sub_blockx+unmask2_x][sub_blocky+unmask2_y].value = swap;
 
+    /* ONLOOKER BEE */
     q_hive = hiveQuality(sudoku);
 
     if(q_hive < c_hive) {
@@ -160,7 +162,8 @@ __global__ void BeeColony (Square * d_unsolved, Square * d_solved,
         c_hive = q_hive;
       } else {
         swap = sudoku[sub_blockx + unmask1_x][sub_blocky + unmask1_y].value;
-        sudoku[sub_blockx + unmask1_x][sub_blocky + unmask1_y].value = sudoku[sub_blockx + unmask2_x][sub_blocky + unmask2_y].value;
+        sudoku[sub_blockx + unmask1_x][sub_blocky + unmask1_y].value = \
+        sudoku[sub_blockx + unmask2_x][sub_blocky + unmask2_y].value;
         sudoku[sub_blockx + unmask2_x][sub_blocky + unmask2_y].value = swap;
       }
     }
@@ -188,6 +191,20 @@ __global__ void BeeColony (Square * d_unsolved, Square * d_solved,
           d_solved7[m + 9 * n] = sudoku[m][n];
         case 7:
           d_solved8[m + 9 * n] = sudoku[m][n];
+        case 8:
+          d_solved9[m + 9 * n] = sudoku[m][n];
+        case 9:
+          d_solved10[m + 9 * n] = sudoku[m][n];
+        case 10:
+          d_solved11[m + 9 * n] = sudoku[m][n];
+        case 11:
+          d_solved12[m + 9 * n] = sudoku[m][n];
+        case 12:
+          d_solved13[m + 9 * n] = sudoku[m][n];
+        case 13:
+          d_solved14[m + 9 * n] = sudoku[m][n];
+        case 14:
+          d_solved15[m + 9 * n] = sudoku[m][n];
         default:
           break;
       }
@@ -208,7 +225,7 @@ void restart (Square * h_unsolved, Square * d_unsolved, int memsize) {
                           cudaMemcpyDeviceToHost));
 
   int ar[3]={0,3,6};
-  int tempa;
+  int swap;
   int rand1 = random()%3;
   int rand2 = random()%3;
 
@@ -221,18 +238,18 @@ void restart (Square * h_unsolved, Square * d_unsolved, int memsize) {
     block_y = ar[rand2];
     do {
       r1_x=random()%3;
-      r1_y=random()%3;;
+      r1_y=random()%3;
     } while (h_unsolved[(block_x + r1_x) + 9 * (block_y + r1_y)].isLocked == -1);
 
     do {
-      r2_x=random()%3;;
-      r2_y=random()%3;;
+      r2_x=random()%3;
+      r2_y=random()%3;
     } while (h_unsolved[(block_x + r2_x) + 9 * (block_y + r2_y)].isLocked == -1);
 
-    tempa = h_unsolved[(block_x + r1_x) + 9 * (block_y + r1_y)].value;
+    swap = h_unsolved[(block_x + r1_x) + 9 * (block_y + r1_y)].value;
     h_unsolved[(block_x + r1_x) + 9 * (block_y + r1_y)].value = \
     h_unsolved[(block_x + r2_x) + 9 * (block_y + r2_y)].value;
-    h_unsolved[(block_x + r2_x) + 9 * (block_y + r2_y)].value = tempa;
+    h_unsolved[(block_x + r2_x) + 9 * (block_y + r2_y)].value = swap;
   }
 
   ERROR_CHECK( cudaMemcpy(d_unsolved, h_unsolved, memsize,
@@ -253,6 +270,27 @@ void ONEDtoTWOD (Square h_sudoku[][9], Square * h_unsolved, int n) {
   }
 }
 
+void CSRtoCSC (Square * h_unsolved, int n) {
+
+  Square * Swap = (Square *) malloc(sizeof(Square) * n * n);
+  int limit = 0;
+  for (int i = 0; i < 9; i++) {
+    for (int j = 0; j < 9; j++) {
+      Swap[i + n * j].value = h_unsolved[limit].value;
+      Swap[i + n * j].isLocked = h_unsolved[limit].isLocked;
+      limit++;
+    }
+  }
+
+  for (int k = 0; k < 81; k++) {
+      h_unsolved[k].value = Swap[k].value;
+      h_unsolved[k].isLocked = Swap[k].isLocked;
+  }
+
+  // free(Swap);
+
+}
+
 /**
  * @brief Initializes the ABC algorithm, and also satisfies 3x3 clause.
  *
@@ -266,15 +304,13 @@ void init_ArtificalBeeColony (Square * h_unsolved, int n) {
 
   for(int block_i = 0; block_i < 3; block_i++) {
     for(int block_j = 0; block_j < 3; block_j++) {
-      for(int k = 0; k < 9; k++)
-        nums_filed[k] = k + 1;
-
+        for(int k = 0; k < 9; k++) { nums_filed[k] = k + 1; }
         for(int i = 0; i < 3; i++) {
           for(int j = 0; j < 3; j++) {
             x = block_i * 3 + i;
             y = block_j * 3 + j;
 
-            if(h_unsolved[x + 9 * y].value != 0){
+            if(h_unsolved[x + 9 * y].isLocked != 0){
               p = h_unsolved[x + 9 * y].value;
               nums_filed[p - 1] = 0;
             }
@@ -303,6 +339,7 @@ void init_ArtificalBeeColony (Square * h_unsolved, int n) {
       }
     }
 }
+
 
 /**
  * @brief Main ABC algorithm controller.
@@ -333,6 +370,13 @@ void ArtificialBeeColony (Square * h_unsolved, Square * d_unsolved,
   Square * d_solved6;
   Square * d_solved7;
   Square * d_solved8;
+  Square * d_solved9;
+  Square * d_solved10;
+  Square * d_solved11;
+  Square * d_solved12;
+  Square * d_solved13;
+  Square * d_solved14;
+  Square * d_solved15;
 
   ERROR_CHECK( cudaMalloc((void**) &d_solved1, memsize));
   ERROR_CHECK( cudaMalloc((void**) &d_solved2, memsize));
@@ -342,6 +386,13 @@ void ArtificialBeeColony (Square * h_unsolved, Square * d_unsolved,
   ERROR_CHECK( cudaMalloc((void**) &d_solved6, memsize));
   ERROR_CHECK( cudaMalloc((void**) &d_solved7, memsize));
   ERROR_CHECK( cudaMalloc((void**) &d_solved8, memsize));
+  ERROR_CHECK( cudaMalloc((void**) &d_solved9, memsize));
+  ERROR_CHECK( cudaMalloc((void**) &d_solved10, memsize));
+  ERROR_CHECK( cudaMalloc((void**) &d_solved11, memsize));
+  ERROR_CHECK( cudaMalloc((void**) &d_solved12, memsize));
+  ERROR_CHECK( cudaMalloc((void**) &d_solved13, memsize));
+  ERROR_CHECK( cudaMalloc((void**) &d_solved14, memsize));
+  ERROR_CHECK( cudaMalloc((void**) &d_solved15, memsize));
 
   // Square * d_sub;
   // ERROR_CHECK( cudaMalloc((void**) &d_sub, memsize * CHAINS));
@@ -364,22 +415,21 @@ void ArtificialBeeColony (Square * h_unsolved, Square * d_unsolved,
   int tolerance = INIT_TOLERANCE;
   int minimum, min_index;
 
-  // Square ** h_sudoku = (Square**) malloc(sizeof(Square) * n * n);
-
   Square h_sudoku[9][9];
+
+  CSRtoCSC(h_unsolved, n);
   init_ArtificalBeeColony(h_unsolved, n);
+
+  // const char * inprogress = "/********** Bee Colony (CSC) **********/";
+  // output(inprogress, "-bee", n, false, h_unsolved);
+
   ONEDtoTWOD(h_sudoku, h_unsolved, n);
 
   int c_hive = hiveQuality(h_sudoku);
-  printf("Current Hive's Quality: %d\n", c_hive);
-
   int p_hive = c_hive;
 
   ERROR_CHECK( cudaMemcpy(d_unsolved, h_unsolved, memsize,
                           cudaMemcpyHostToDevice) );
-
-  // const char * finished = "/********** Bee Colony (IP) **********/";
-  // output(finished, "-bee", n, false, h_unsolved);
 
   do {
 
@@ -389,8 +439,10 @@ void ArtificialBeeColony (Square * h_unsolved, Square * d_unsolved,
     BeeColony<<< grid, block >>>(d_unsolved, d_solved, n, d_state, c_hive,
                                qualityHives, effort, // d_sub);
                                d_solved1, d_solved2, d_solved3,
-                               d_solved4, d_solved5, d_solved6, d_solved7,
-                               d_solved8);
+                               d_solved4, d_solved5, d_solved6,
+                               d_solved7, d_solved8, d_solved9,
+                               d_solved10, d_solved11, d_solved12,
+                               d_solved13, d_solved14, d_solved15);
 
     ERROR_CHECK( cudaPeekAtLastError() );
     ERROR_CHECK( cudaDeviceSynchronize() );
@@ -436,7 +488,27 @@ void ArtificialBeeColony (Square * h_unsolved, Square * d_unsolved,
       case 7:
         ERROR_CHECK( cudaMemcpy(d_unsolved, d_solved8, memsize,
                                 cudaMemcpyDeviceToDevice));
-
+      case 8:
+        ERROR_CHECK( cudaMemcpy(d_unsolved, d_solved9, memsize,
+                                cudaMemcpyDeviceToDevice));
+      case 9:
+        ERROR_CHECK( cudaMemcpy(d_unsolved, d_solved10, memsize,
+                                cudaMemcpyDeviceToDevice));
+      case 10:
+        ERROR_CHECK( cudaMemcpy(d_unsolved, d_solved11, memsize,
+                                cudaMemcpyDeviceToDevice));
+      case 11:
+        ERROR_CHECK( cudaMemcpy(d_unsolved, d_solved12, memsize,
+                                cudaMemcpyDeviceToDevice));
+      case 12:
+        ERROR_CHECK( cudaMemcpy(d_unsolved, d_solved13, memsize,
+                                cudaMemcpyDeviceToDevice));
+      case 13:
+        ERROR_CHECK( cudaMemcpy(d_unsolved, d_solved14, memsize,
+                                cudaMemcpyDeviceToDevice));
+      case 14:
+        ERROR_CHECK( cudaMemcpy(d_unsolved, d_solved15, memsize,
+                                cudaMemcpyDeviceToDevice));
       default:
         break;
     }
@@ -465,7 +537,6 @@ void ArtificialBeeColony (Square * h_unsolved, Square * d_unsolved,
 
   } while (effort > EFFORT_MIN);
 
-  // printf("Final Hive's Quality: %d\n", c_hive);
   ERROR_CHECK( cudaMemcpy(d_solved, d_unsolved, memsize, cudaMemcpyDeviceToDevice));
 
   return;
