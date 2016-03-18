@@ -40,7 +40,7 @@ __device__
 int isPossibleNum(vPossible newNum, vPossible * possibleNum){
 	for(int i = 0; i < 9; i++){
 		if(possibleNum[i] != '\0'){
-			if(possibleNum == newNum){
+			if(possibleNum[i] == newNum){
 				return i;
 			}
 		}

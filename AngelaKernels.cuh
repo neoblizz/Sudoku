@@ -26,7 +26,7 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 	// TODO: set grid/TPB
 	// TODO: call populate kernel (located in populate.cu)
 	// TODO: after populate works, test human.cu
-	// TODO: after every human call, need to populate again	
+	// TODO: after every human call, need to populate again
 
 
 	int memsize = sizeof(Square) * n * n;
@@ -37,10 +37,13 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 	int threadsPerBlock = n;
 	int blocksPerGrid = (n + threadsPerBlock -1) / threadsPerBlock;
 
-	populate<<<blocksPerGrid, threadsPerBlock>>> (d_unsolved); 
+	populate<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved);
+
+	ERROR_CHECK( cudaPeekAtLastError() );
+  ERROR_CHECK( cudaDeviceSynchronize() );
 
 	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
-		cudaMemcpyHostToDevice) );
+		cudaMemcpyDeviceToHost) );
 
 	debug_values(h_unsolved);
 
@@ -48,16 +51,3 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 
 }
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
