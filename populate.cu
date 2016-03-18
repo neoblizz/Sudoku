@@ -181,12 +181,13 @@ __global__ void populate(Square* board) {
 	__syncthreads();
 
 	if (threadIdx.x == 0) {
-		for (int i=0; i<81; i++)
+		for (int i=0; i<81; i++){
 			board[i].value = s_board[i].value;
 			board[i].isLocked = s_board[i].isLocked;
 
-			for (int j=0; j<9; j++)
+			for (int j=0; j<9; j++){
 					board[i].possValues[j] = s_board[i].possValues[j];
+			}
 	}
 
 }
