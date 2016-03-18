@@ -14,16 +14,16 @@
 __device__
 void getRow(int tid, Square* board, Square* localRow) {
 
-	int rowNum = floor(tid/9);
+	int rowNum = (tid/9); // had floor here before
 	int startOfRow = rowNum*9;
 	//Square output[9];
 
 	for (int i = 0; i<9; i++) {
 		localRow[i].value = board[startOfRow + i].value;
 		localRow[i].isLocked = board[startOfRow + i].isLocked;
-	
+
 		for (int j=0; j<9; j++) {
-			localRow[i].possValues[j] = board[startOfRow + i].possValues[j];	
+			localRow[i].possValues[j] = board[startOfRow + i].possValues[j];
 		}
 	}
 
@@ -36,13 +36,13 @@ void getCol(int tid, Square* board, Square* localCol) {
 
 	int colNum = tid%9; // also first element of the column
 	//Square output[9];
-	
+
 	for (int i = 0; i<9; i++) {
 		localCol[i].value = board[colNum + (9*i)].value;
 		localCol[i].isLocked = board[colNum + (9*i)].isLocked;
-	
+
 		for (int j=0; j<9; j++) {
-			localCol[i].possValues[j] = board[colNum + (9*i)].possValues[j];	
+			localCol[i].possValues[j] = board[colNum + (9*i)].possValues[j];
 		}
 
 	}
@@ -55,13 +55,13 @@ __device__
 void getBlock(int tid, Square* board, Square* localBlock) {
 
 	int blockRow; // tells us if it's in the top/mid/bot
-	
+
 	if (tid<27)
 		blockRow = 0; //top
 
 	else if (tid<54)
 		blockRow = 1; //middle
-	
+
 	else
 		blockRow = 2; //bottom
 
@@ -82,13 +82,30 @@ void getBlock(int tid, Square* board, Square* localBlock) {
 	//now we know exactly which block we are dealing with, sooooo
 
 	int starter = blockRow*27 + blockCol*3;
+	int offset;
 
-	localBlock[9] =
-		(board[starter], board[starter+1], board[starter+2],
+	for (int i=0; i<9; i++) {
+
+		if (i<3)
+			offset = i;
+		else if (i<6)
+			offset = i -3 +9;
+		else
+			offset = i -6 +18;
+
+		localBlock[i].value = board[starter + offset].value;
+		localBlock[i].isLocked = board[starter + offset].isLocked;
+
+		for(int j=0; j<9; j++)
+				localBlock[i].possValues[j] = board[starter+offset].possValues[j];
+	}
+
+
+/*	localBlock =
+		{board[starter], board[starter+1], board[starter+2],
 		board[starter+9], board[starter+10], board[starter+11],
-		board[starter+18], board[starter+19], board[starter+20]);	
-
-	//return output;
+		board[starter+18], board[starter+19], board[starter+20]};
+*/	//return output;
 
 }
 
@@ -99,10 +116,15 @@ __global__ void populate(Square* board) {
 
 	if (threadIdx.x == 0) {
 		for(int i = 0; i<81; i++) {
-			s_board[i] = board[i];
+			s_board[i].value = board[i].value;
+			s_board[i].isLocked = board[i].isLocked;
+
+			for (int j=0; j<9; j++) {
+					s_board[i].possValues[j] = board[i].possValues[j];
+			}
 		}
 	}
-		
+
 
 	int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
@@ -137,7 +159,7 @@ __global__ void populate(Square* board) {
 		int cur;
 		for (int i=0; i<9; i++) {
 			cur = s_board[tid].possValues[i];
-			
+
 			if (cur==NULL)
 				break;
 
@@ -159,8 +181,12 @@ __global__ void populate(Square* board) {
 	__syncthreads();
 
 	if (threadIdx.x == 0) {
-		for (int i = 0; i<81; i++)
-			board[i] = s_board[i];
+		for (int i=0; i<81; i++)
+			board[i].value = s_board[i].value;
+			board[i].isLocked = s_board[i].isLocked;
+
+			for (int j=0; j<9; j++)
+					board[i].possValues[j] = s_board[i].possValues[j];
 	}
 
 }

@@ -58,22 +58,19 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   cudaEventSynchronize(stop);
   cudaEventElapsedTime(&elapsedTime, start, stop);
 
-  Square * h_solved = (Square *) malloc(memsize);
-  ERROR_CHECK( cudaMemcpy(h_solved, d_solved, memsize,
-                          cudaMemcpyDeviceToHost) );
+//  Square * h_solved = (Square *) malloc(memsize);
+//  ERROR_CHECK( cudaMemcpy(h_solved, d_solved, memsize,
+//                          cudaMemcpyDeviceToHost) );
 
   /* Destroy CUDA event */
   cudaEventDestroy(start);
   cudaEventDestroy(stop);
 
   // TODO: Terminal Output will go here.
-  const char * alg = "-bee";
+  const char * alg = "-ang";
 
-  if (!strcmp(alg, "-bee")) {
-    CSRtoCSC(h_solved, n);
-    const char * finished = "/********** Bee Colony (C) **********/";
-    output(finished, alg, n, false, h_solved);
-  }
+//    const char * finished = "/********** Angela's (C) **********/";
+//    output(finished, alg, n, false, h_solved);
 
   const char* statistics = "/******* Statistics (Begin) ********/";
   printf("%s\n", statistics);
