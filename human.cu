@@ -76,12 +76,12 @@ __global__ void human(Square* d_board, int n) {
 					numPossValues++;
 			}
 
-		if (numPossValues==1) {
-			// only 1 number in possValues array
-			s_board[tid].value = s_board[tid].possValues[0];
-			s_board[tid].isLocked = -1;
-			points++;
-		}
+			if (numPossValues==1) {
+				// only 1 number in possValues array
+				s_board[tid].value = s_board[tid].possValues[0];
+				s_board[tid].isLocked = -1;
+				points++;
+			}
 		
 		Square localRow[9];
 		Square localCol[9];
@@ -108,8 +108,9 @@ __global__ void human(Square* d_board, int n) {
 			num = s_board[tid].possValues[i];
 	
 			// first, make sure we're looking at a valid int
-				if (num==NULL)
-					break;
+			/*	if (num==NULL)
+					break; */
+			if (num!=0) {
 
 			// now check for num in the possValues arrays for all Squares in the row
 			// if we see the number, break and start checking col,
@@ -135,7 +136,7 @@ __global__ void human(Square* d_board, int n) {
 				}
 
 			// now do the same for the column
-				nocheck = floor(tid/9); // for col, we don't check the row we're in
+				nocheck = tid/9; // for col, we don't check the row we're in. used to be floor
 
 				for (int j=0; j<n; j++) {
 					if (j!=nocheck && localCol[j].isLocked!=-1) {
@@ -169,7 +170,7 @@ __global__ void human(Square* d_board, int n) {
 					s_board[tid].isLocked = -1;
 					points++;
 				}
-
+			}
 		}
 
 __syncthreads();

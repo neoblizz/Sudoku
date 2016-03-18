@@ -44,7 +44,7 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 
 	debug_values(h_unsolved);
 
-	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved);
+	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n);
 
 	ERROR_CHECK( cudaPeekAtLastError() );
 	ERROR_CHECK( cudaDeviceSynchronize() );
