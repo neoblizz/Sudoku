@@ -93,7 +93,7 @@ void output(const char * description, const char * algorithm,
  */
 void debug_values(Square * display) {
 
-  for (int i = 0; i < 18; i++) {
+  for (int i = 0; i < 9; i++) {
     printf("[%d, %d]  | v | => [", 0, i);
     for (int j = 0; j < (sizeof(display[i].possValues)/sizeof(*display[i].possValues)); j++) {
       printf("%d ", display[i].possValues[j]);

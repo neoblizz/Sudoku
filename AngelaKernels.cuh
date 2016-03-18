@@ -31,8 +31,9 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 	ERROR_CHECK( cudaMemcpy(d_unsolved, h_unsolved, memsize,
          	cudaMemcpyHostToDevice) );
 
-	int threadsPerBlock = n;
+	int threadsPerBlock = n*n;
 	int blocksPerGrid = (n + threadsPerBlock -1) / threadsPerBlock;
+//	int blocksPerGrid = 1;
 
 	populate<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved);
 
