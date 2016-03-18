@@ -45,7 +45,10 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 
 	debug_values(h_unsolved);
 
-	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n);
+	  int* d_points;
+	  ERROR_CHECK( cudaMalloc((void**) &d_points, sizeof(int)) );
+
+	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n, d_points);
 
 	ERROR_CHECK( cudaPeekAtLastError() );
 	ERROR_CHECK( cudaDeviceSynchronize() );
