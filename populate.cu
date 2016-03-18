@@ -125,6 +125,7 @@ __global__ void populate(Square* board) {
 		}
 	}
 
+	__syncthreads();
 
 	int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
