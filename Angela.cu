@@ -63,9 +63,9 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   cudaEventSynchronize(stop);
   cudaEventElapsedTime(&elapsedTime, start, stop);
 
-//  Square * h_solved = (Square *) malloc(memsize);
-//  ERROR_CHECK( cudaMemcpy(h_solved, d_solved, memsize,
-//                          cudaMemcpyDeviceToHost) );
+  Square * h_solved = (Square *) malloc(memsize);
+  ERROR_CHECK( cudaMemcpy(h_solved, d_unsolved, memsize,
+                          cudaMemcpyDeviceToHost) );
 
   /* Destroy CUDA event */
   cudaEventDestroy(start);
@@ -75,7 +75,7 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   const char * alg = "-ang";
 
     const char * finished = "/********** Angela's (C) **********/";
-    output(finished, alg, n, false, h_unsolved);
+    output(finished, alg, n, false, h_solved);
 
   const char* statistics = "/******* Statistics (Begin) ********/";
   printf("%s\n", statistics);

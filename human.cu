@@ -116,6 +116,7 @@ __global__ void human(Square* d_board, int n) {
 			// if we see the number, break and start checking col,
 			// otherwise set the value to num and lock it
 			// just make sure you don't check against the current square, otherwise never win!
+				onlyOne = 0;
 				nocheck = tid%9; // for row, we don't want to check the column tid is in
 				for (int j=0; j<n; j++) {
 					if (j!=nocheck && localRow[j].isLocked!=-1) {
@@ -123,52 +124,83 @@ __global__ void human(Square* d_board, int n) {
 						// skip Squares that are locked as a precaution
 							// since we don't clear possValues after locking
 
-						// look for num in localRow[j].possValues, using device function
-						onlyOne = isPossibleNum(num, localRow[j].possValues);	
-						if (onlyOne!=-1)
+						// look for num in localRow[j].possValues[num-1]
+						if (num==localRow[j].possValues[num-1]) {
+							onlyOne = -1; // set onlyOne = -1 if NOT the only one
 							break;
+						}
 					}
+				}
+
+						// look for num in localRow[j].possValues, using device function
+						/*onlyOne = isPossibleNum(num, localRow[j].possValues);	
+						if (onlyOne!=-1)
+							break; 
+					}*/
 					// if you get here, means num was not a possValue in any other Square in row
 					// so set value and lock it
+				if (onlyOne!=-1) {
 					s_board[tid].value = num;
 					s_board[tid].isLocked = -1;
 					points++;
+					break;
 				}
+				
 
 			// now do the same for the column
+				onlyOne = 0;
 				nocheck = tid/9; // for col, we don't check the row we're in. used to be floor
 
 				for (int j=0; j<n; j++) {
 					if (j!=nocheck && localCol[j].isLocked!=-1) {
 
+						if (num==localCol[j].possValues[num-1]) {
+							onlyOne = -1;
+							break;
+						}
+					}
+				}
+
 						// look for num in localRow[j].possValues, using device function
-						onlyOne = isPossibleNum(num, localCol[j].possValues);	
+						/*onlyOne = isPossibleNum(num, localCol[j].possValues);	
 						if (onlyOne!=-1)
 							break;
-					}
+					}*/
 					// if you get here, means num was not a possValue in any other Square in col
 					// so set value and lock it
+				if (onlyOne!=-1) {
 					s_board[tid].value = num;
 					s_board[tid].isLocked = -1;
 					points++;
+					break;
 				}
 
 			// now do again for block
+				onlyOne = 0;
 				nocheck = findLocalBlockIdx(tid);
 
 				for (int j=0; j<n; j++) {
 					if (j!=nocheck && localBlock[j].isLocked!=-1) {
 
+						if (num==localBlock[j].possValues[num-1]) {
+							onlyOne = -1;
+							break;
+						}
+					}
+				}
+
 						// look for num in localRow[j].possValues, using device function
-						onlyOne = isPossibleNum(num, localBlock[j].possValues);	
+						/*onlyOne = isPossibleNum(num, localBlock[j].possValues);	
 						if (onlyOne!=-1)
 							break;
-					}
+					}*/
 					// if you get here, means num was not a possValue in any other Square in col
 					// so set value and lock it
+				if (onlyOne!=-1) {
 					s_board[tid].value = num;
 					s_board[tid].isLocked = -1;
 					points++;
+					break;
 				}
 			}
 		}
