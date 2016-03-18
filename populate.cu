@@ -156,7 +156,7 @@ __global__ void populate(Square* board) {
 
 		// use popoff to remove invalid values from the possValues array
 
-		int cur;
+		//int cur;
 		int rowVal, colVal, blockVal;
 		for (int i=0; i<9; i++) {
 			//cur = s_board[tid].possValues[i];

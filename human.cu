@@ -7,18 +7,18 @@
 
 __device__
 int findLocalBlockIdx(int tid) {
-	int blockRow = floor(tid/27);
+	int blockRow = tid/27; // used to be floor
 	int col = tid%9;
 	int blockCol;
 	
 	if (col<3)
-		blockCol = 0;
-	else if (col<6)
+		blockCol = 0;	
+	else if (col<6) 
 		blockCol = 1;
-	else
+	else 
 		blockCol = 2;
 
-	int starter = blockRow*27 + blockCol*3;
+	int starter = (blockRow*27) + (blockCol*3);
 
 	int difference = tid - starter;
 
@@ -70,7 +70,11 @@ __global__ void human(Square* d_board, int n) {
 		// and if the Square we're looking at is NOT locked (-1)
 
 		// first, check if only one option in possValues array
-		numPossValues = sizeof(s_board[tid].possValues) / sizeof(int);
+			//numPossValues = sizeof(s_board[tid].possValues) / sizeof(int);
+			for (int k=0; k<n; k++) {
+				if (s_board[tid].possValues[k] != 0)
+					numPossValues++;
+			}
 
 		if (numPossValues==1) {
 			// only 1 number in possValues array
