@@ -157,10 +157,25 @@ __global__ void populate(Square* board) {
 		// use popoff to remove invalid values from the possValues array
 
 		int cur;
+		int rowVal, colVal, blockVal;
 		for (int i=0; i<9; i++) {
-			cur = s_board[tid].possValues[i];
+			//cur = s_board[tid].possValues[i];
+		
+			rowVal = localRowValues[i];
+			colVal = localColValues[i];
+			blockVal = localBlockValues[i];	
 
-			if (cur==NULL)
+			if (rowVal != 0)
+				s_board[tid].possValues[rowVal-1] = 0;
+	
+			if (colVal != 0)
+				s_board[tid].possValues[colVal-1] = 0;
+
+			if (blockVal != 0)
+				s_board[tid].possValues[blockVal-1] = 0;
+
+
+/*			if (cur==NULL)
 				break;
 
 			// check if another Square in the row/col/block makes cur
@@ -172,8 +187,8 @@ __global__ void populate(Square* board) {
 				//isPossibleNum checks if it's even in the
 				//array of possValues
 				popoff(i, s_board[i].possValues);
-
-			}
+*/
+		
 
 		}
 	}
@@ -181,12 +196,13 @@ __global__ void populate(Square* board) {
 	__syncthreads();
 
 	if (threadIdx.x == 0) {
-		for (int i=0; i<81; i++)
+		for (int i=0; i<81; i++) {
 			board[i].value = s_board[i].value;
 			board[i].isLocked = s_board[i].isLocked;
 
 			for (int j=0; j<9; j++)
 					board[i].possValues[j] = s_board[i].possValues[j];
+		}
 	}
 
 }
