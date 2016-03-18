@@ -156,7 +156,7 @@ __global__ void populate(Square* board) {
 
 		// use popoff to remove invalid values from the possValues array
 
-		int cur;
+		//int cur;
 		int rowVal, colVal, blockVal;
 		for (int i=0; i<9; i++) {
 			//cur = s_board[tid].possValues[i];
@@ -196,21 +196,14 @@ __global__ void populate(Square* board) {
 	__syncthreads();
 
 	if (threadIdx.x == 0) {
-<<<<<<< HEAD
-		for (int i=0; i<81; i++){
-=======
 		for (int i=0; i<81; i++) {
->>>>>>> 506108a996747e67e1bcd2ea9d8188d01740fcf9
 			board[i].value = s_board[i].value;
 			board[i].isLocked = s_board[i].isLocked;
 
-			for (int j=0; j<9; j++){
-					board[i].possValues[j] = s_board[i].possValues[j];
-<<<<<<< HEAD
-			}
-=======
+			for (int j=0; j<9; j++)
+				board[i].possValues[j] = s_board[i].possValues[j];
+
 		}
->>>>>>> 506108a996747e67e1bcd2ea9d8188d01740fcf9
 	}
 
 }

@@ -2,9 +2,6 @@
 #define ANG_H
 
 
-// TODO: Do I need #ifndef for headers here? or just in kernel files ok?
-
-
 // this file will call populate.cu and human.cu
 
 
@@ -16,7 +13,7 @@
 #include "data.cuh"
 
 #include "populate.cu"
-//#include "human.cu"
+#include "human.cu"
 
 using namespace std;
 
@@ -40,13 +37,20 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 	populate<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved);
 
 	ERROR_CHECK( cudaPeekAtLastError() );
-  ERROR_CHECK( cudaDeviceSynchronize() );
+	ERROR_CHECK( cudaDeviceSynchronize() );
 
 	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
 		cudaMemcpyDeviceToHost) );
 
 	debug_values(h_unsolved);
 
+	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n);
+
+	ERROR_CHECK( cudaPeekAtLastError() );
+	ERROR_CHECK( cudaDeviceSynchronize() );
+	
+	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
+		cudaMemcpyDeviceToHost) );
 
 
 }

@@ -7,18 +7,18 @@
 
 __device__
 int findLocalBlockIdx(int tid) {
-	int blockRow = floor(tid/27);
+	int blockRow = tid/27; // used to be floor
 	int col = tid%9;
 	int blockCol;
 	
 	if (col<3)
-		blockCol = 0;
-	else if (col<6)
+		blockCol = 0;	
+	else if (col<6) 
 		blockCol = 1;
-	else
+	else 
 		blockCol = 2;
 
-	int starter = blockRow*27 + blockCol*3;
+	int starter = (blockRow*27) + (blockCol*3);
 
 	int difference = tid - starter;
 
@@ -45,33 +45,43 @@ int findLocalBlockIdx(int tid) {
 
 
 
-__global__ void (Square* d_board, int n) {
+__global__ void human(Square* d_board, int n) {
 
 	__shared__ Square s_board[81];
 
 	if (threadIdx.x == 0) {
 		// initialize shared memory
 		for (int i = 0; i<(n*n); i++) {
-			s_board[i] = d_board[i];
+			s_board[i].value = d_board[i].value;
+			s_board[i].isLocked = d_board[i].isLocked;
+
+			for (int j=0; j<n; j++) 
+				s_board[i].possValues[j] = d_board[i].possValues[j];
+
 		}
 	}
 
 	int tid = threadIdx.x + blockIdx.x*blockDim.x;
 	int points = 0; // for keeping track of work done
+	int numPossValues;
 
 	if ( (tid<(n*n)) && s_board[tid].isLocked!=-1) {
 		// enter the if statement if the thread is a valid Square
 		// and if the Square we're looking at is NOT locked (-1)
 
 		// first, check if only one option in possValues array
-		numPossValues = sizeof(s_board[tid].possValues) / sizeof(int);
+			//numPossValues = sizeof(s_board[tid].possValues) / sizeof(int);
+			for (int k=0; k<n; k++) {
+				if (s_board[tid].possValues[k] != 0)
+					numPossValues++;
+			}
 
-		if (numPossValues==1) {
-			// only 1 number in possValues array
-			s_board[tid].value = s_board[tid].possValues[0];
-			s_board[tid].isLocked = -1;
-			points++;
-		}
+			if (numPossValues==1) {
+				// only 1 number in possValues array
+				s_board[tid].value = s_board[tid].possValues[0];
+				s_board[tid].isLocked = -1;
+				points++;
+			}
 		
 		Square localRow[9];
 		Square localCol[9];
@@ -82,9 +92,9 @@ __global__ void (Square* d_board, int n) {
 		getBlock(tid, s_board, localBlock);
 
 
-		int num, nocheck;
+		int num, nocheck, onlyOne;
 		// check if each number can only be in this Square for row/col/block
-		for (i=0; i<9; i++) {
+		for (int i=0; i<9; i++) {
 			// cycle through all values in possValues array
 			// if any of row/col/block has no other Squares with curVal in possValues
 				// that value must be the Square's locked value
@@ -98,8 +108,9 @@ __global__ void (Square* d_board, int n) {
 			num = s_board[tid].possValues[i];
 	
 			// first, make sure we're looking at a valid int
-				if (num==NULL)
-					break;
+			/*	if (num==NULL)
+					break; */
+			if (num!=0) {
 
 			// now check for num in the possValues arrays for all Squares in the row
 			// if we see the number, break and start checking col,
@@ -125,9 +136,9 @@ __global__ void (Square* d_board, int n) {
 				}
 
 			// now do the same for the column
-				nocheck = floor(tid/9); // for col, we don't check the row we're in
+				nocheck = tid/9; // for col, we don't check the row we're in. used to be floor
 
-				for (j=0; j<n; j++) {
+				for (int j=0; j<n; j++) {
 					if (j!=nocheck && localCol[j].isLocked!=-1) {
 
 						// look for num in localRow[j].possValues, using device function
@@ -145,7 +156,7 @@ __global__ void (Square* d_board, int n) {
 			// now do again for block
 				nocheck = findLocalBlockIdx(tid);
 
-				for (j=0; j<n; j++) {
+				for (int j=0; j<n; j++) {
 					if (j!=nocheck && localBlock[j].isLocked!=-1) {
 
 						// look for num in localRow[j].possValues, using device function
@@ -159,20 +170,20 @@ __global__ void (Square* d_board, int n) {
 					s_board[tid].isLocked = -1;
 					points++;
 				}
-
+			}
 		}
 
 __syncthreads();
 
 	// copy back from shared mem to global mem
 	if (threadIdx.x == 0) {
-		for (i=0; i<(n*n); i++) {
+		for (int i=0; i<(n*n); i++) {
 			d_board[i].value = s_board[i].value;
 			d_board[i].isLocked = s_board[i].isLocked;
 	
 			if (s_board[i].isLocked!=-1) {
 		
-				for (j=0; j<n; j++) {
+				for (int j=0; j<n; j++) {
 					d_board[i].possValues[j] = s_board[i].possValues[j];
 				}
 			}

@@ -74,8 +74,8 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   // TODO: Terminal Output will go here.
   const char * alg = "-ang";
 
-//    const char * finished = "/********** Angela's (C) **********/";
-//    output(finished, alg, n, false, h_solved);
+    const char * finished = "/********** Angela's (C) **********/";
+    output(finished, alg, n, false, h_unsolved);
 
   const char* statistics = "/******* Statistics (Begin) ********/";
   printf("%s\n", statistics);
