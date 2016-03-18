@@ -49,8 +49,8 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 	ERROR_CHECK( cudaPeekAtLastError() );
 	ERROR_CHECK( cudaDeviceSynchronize() );
 	
-	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
-		cudaMemcpyDeviceToHost) );
+//	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
+//		cudaMemcpyDeviceToHost) );
 
 
 }

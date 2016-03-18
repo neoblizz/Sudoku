@@ -165,13 +165,14 @@ __global__ void populate(Square* board) {
 			colVal = localColValues[i];
 			blockVal = localBlockValues[i];	
 
-			if (rowVal != 0)
+			if (rowVal>=1 && rowVal<=9)
 				s_board[tid].possValues[rowVal-1] = 0;
 	
-			if (colVal != 0)
+//			if (colVal != 0)
+			if (colVal>=1 && colVal<=9)
 				s_board[tid].possValues[colVal-1] = 0;
 
-			if (blockVal != 0)
+			if (blockVal>=1 && blockVal<=9)
 				s_board[tid].possValues[blockVal-1] = 0;
 
 
