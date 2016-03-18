@@ -28,7 +28,7 @@
 //#include "beecolony.cuh"
 #include "AngelaKernels.cuh"
 
-#include "bfsKernel.cuh"
+//#include "bfsKernel.cuh"
 
 void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
 
@@ -55,7 +55,7 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   cudaEventRecord(start, 0);
 //  ArtificialBeeColony (h_unsolved, d_unsolved, d_solved, n);
   AngelaKernels(h_unsolved, d_unsolved, d_solved, n);
-  bfsKernel( h_unsolved, d_unsolved, d_solved, n);
+//  bfsKernel( h_unsolved, d_unsolved, d_solved, n);
 
 
 

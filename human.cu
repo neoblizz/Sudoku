@@ -189,7 +189,7 @@ __syncthreads();
 			}
 		}
 	}
-
+	}
 }
 
 #endif 
