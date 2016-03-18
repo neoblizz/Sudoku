@@ -26,6 +26,8 @@
 
 // includes, kernels
 #include "beecolony.cuh"
+#include "AngelaKernels.cuh"
+#include "bfsKernel.cuh"
 
 void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
 
