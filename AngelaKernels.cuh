@@ -34,7 +34,15 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 	int threadsPerBlock = n*n;
 	int blocksPerGrid = (n + threadsPerBlock -1) / threadsPerBlock;
 //	int blocksPerGrid = 1;
+	
+	 	 int* d_points;
+		  ERROR_CHECK( cudaMalloc((void**) &d_points, sizeof(int)) );
 
+		int* h_points = (int*) malloc(sizeof(int));
+//		ERROR_CHECK( cudaMemcpy(h_points, d_points, sizeof(int),
+//			cudaMemcpyDeviceToHost));
+
+//for(int jj=0; jj<1; jj++) {
 	populate<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved);
 
 	ERROR_CHECK( cudaPeekAtLastError() );
@@ -45,16 +53,58 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 
 	debug_values(h_unsolved);
 
-	  int* d_points;
-	  ERROR_CHECK( cudaMalloc((void**) &d_points, sizeof(int)) );
+//	  int* d_points;
+//	  ERROR_CHECK( cudaMalloc((void**) &d_points, sizeof(int)) );
 
-	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n, d_points);
+	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n, d_points);		
 
 	ERROR_CHECK( cudaPeekAtLastError() );
 	ERROR_CHECK( cudaDeviceSynchronize() );
+
+//		int* h_points = (int*) malloc(sizeof(int));
+		ERROR_CHECK( cudaMemcpy(h_points, d_points, sizeof(int),
+			cudaMemcpyDeviceToHost));
+
+	printf("Amount of work done this round is %d.\n", *h_points);  
+//}
 	
-//	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
-//		cudaMemcpyDeviceToHost) );
+	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
+		cudaMemcpyDeviceToHost) );  
+
+ 
+     const char * finished = "/********** Angela's (C) **********/";
+    output(finished, "-alg", n, false, h_unsolved);
+
+//round 2
+	populate<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved);
+
+	ERROR_CHECK( cudaPeekAtLastError() );
+	ERROR_CHECK( cudaDeviceSynchronize() );
+
+	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
+		cudaMemcpyDeviceToHost) );
+
+	debug_values(h_unsolved);
+
+//	  int* d_points;
+//	  ERROR_CHECK( cudaMalloc((void**) &d_points, sizeof(int)) );
+
+	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n, d_points);		
+
+	ERROR_CHECK( cudaPeekAtLastError() );
+	ERROR_CHECK( cudaDeviceSynchronize() );
+
+//		int* h_points = (int*) malloc(sizeof(int));
+		ERROR_CHECK( cudaMemcpy(h_points, d_points, sizeof(int),
+			cudaMemcpyDeviceToHost));
+
+	printf("Amount of work done this round is %d.\n", *h_points);  
+	
+	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
+		cudaMemcpyDeviceToHost) );  
+
+//    const char * finished = "/********** Angela's (C) **********/";
+    output(finished, "-bee", n, false, h_unsolved);
 
 
 }
