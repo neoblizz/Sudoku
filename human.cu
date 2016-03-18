@@ -45,11 +45,13 @@ int findLocalBlockIdx(int tid) {
 
 
 
-__global__ void human(Square* d_board, int n) {
+__global__ void human(Square* d_board, int n, int* d_points) {
 
 	__shared__ Square s_board[81];
+	__shared__ int s_points;
 
 	if (threadIdx.x == 0) {
+		s_points = 0;
 		// initialize shared memory
 		for (int i = 0; i<(n*n); i++) {
 			s_board[i].value = d_board[i].value;
@@ -62,7 +64,7 @@ __global__ void human(Square* d_board, int n) {
 	}
 
 	int tid = threadIdx.x + blockIdx.x*blockDim.x;
-	int points = 0; // for keeping track of work done
+	//d_points = 0; // for keeping track of work done
 	int numPossValues;
 
 	if ( (tid<(n*n)) && s_board[tid].isLocked!=-1) {
@@ -80,7 +82,8 @@ __global__ void human(Square* d_board, int n) {
 				// only 1 number in possValues array
 				s_board[tid].value = s_board[tid].possValues[0];
 				s_board[tid].isLocked = -1;
-				points++;
+				//points++;
+				atomicAdd(&s_points, 1);
 			}
 		
 		Square localRow[9];
@@ -142,7 +145,8 @@ __global__ void human(Square* d_board, int n) {
 				if (onlyOne!=-1) {
 					s_board[tid].value = num;
 					s_board[tid].isLocked = -1;
-					points++;
+					//points++;
+					atomicAdd(&s_points, 1);
 					break;
 				}
 				
@@ -171,7 +175,8 @@ __global__ void human(Square* d_board, int n) {
 				if (onlyOne!=-1) {
 					s_board[tid].value = num;
 					s_board[tid].isLocked = -1;
-					points++;
+					//points++;
+					atomicAdd(&s_points, 1);
 					break;
 				}
 
@@ -199,7 +204,8 @@ __global__ void human(Square* d_board, int n) {
 				if (onlyOne!=-1) {
 					s_board[tid].value = num;
 					s_board[tid].isLocked = -1;
-					points++;
+					atomicAdd(&s_points, 1);
+					//points++;
 					break;
 				}
 			}
@@ -209,6 +215,7 @@ __syncthreads();
 
 	// copy back from shared mem to global mem
 	if (threadIdx.x == 0) {
+		*d_points = s_points;
 		for (int i=0; i<(n*n); i++) {
 			d_board[i].value = s_board[i].value;
 			d_board[i].isLocked = s_board[i].isLocked;

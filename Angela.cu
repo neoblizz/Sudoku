@@ -51,6 +51,10 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   Square * d_solved;
   ERROR_CHECK( cudaMalloc((void**) &d_solved, memsize) );
 
+//  int* d_points;
+//  ERROR_CHECK( cudaMalloc((void**) &d_points, sizeof(int)) );
+
+
   float elapsedTime;
   cudaEventRecord(start, 0);
 //  ArtificialBeeColony (h_unsolved, d_unsolved, d_solved, n);
