@@ -45,19 +45,25 @@ int findLocalBlockIdx(int tid) {
 
 
 
-__global__ void (Square* d_board, int n) {
+__global__ void human(Square* d_board, int n) {
 
 	__shared__ Square s_board[81];
 
 	if (threadIdx.x == 0) {
 		// initialize shared memory
 		for (int i = 0; i<(n*n); i++) {
-			s_board[i] = d_board[i];
+			s_board[i].value = d_board[i].value;
+			s_board[i].isLocked = d_board[i].isLocked;
+
+			for (int j=0; j<n; j++) 
+				s_board[i].possValues[j] = d_board[i].possValues[j];
+
 		}
 	}
 
 	int tid = threadIdx.x + blockIdx.x*blockDim.x;
 	int points = 0; // for keeping track of work done
+	int numPossValues;
 
 	if ( (tid<(n*n)) && s_board[tid].isLocked!=-1) {
 		// enter the if statement if the thread is a valid Square
@@ -82,9 +88,9 @@ __global__ void (Square* d_board, int n) {
 		getBlock(tid, s_board, localBlock);
 
 
-		int num, nocheck;
+		int num, nocheck, onlyOne;
 		// check if each number can only be in this Square for row/col/block
-		for (i=0; i<9; i++) {
+		for (int i=0; i<9; i++) {
 			// cycle through all values in possValues array
 			// if any of row/col/block has no other Squares with curVal in possValues
 				// that value must be the Square's locked value
@@ -127,7 +133,7 @@ __global__ void (Square* d_board, int n) {
 			// now do the same for the column
 				nocheck = floor(tid/9); // for col, we don't check the row we're in
 
-				for (j=0; j<n; j++) {
+				for (int j=0; j<n; j++) {
 					if (j!=nocheck && localCol[j].isLocked!=-1) {
 
 						// look for num in localRow[j].possValues, using device function
@@ -145,7 +151,7 @@ __global__ void (Square* d_board, int n) {
 			// now do again for block
 				nocheck = findLocalBlockIdx(tid);
 
-				for (j=0; j<n; j++) {
+				for (int j=0; j<n; j++) {
 					if (j!=nocheck && localBlock[j].isLocked!=-1) {
 
 						// look for num in localRow[j].possValues, using device function
@@ -166,13 +172,13 @@ __syncthreads();
 
 	// copy back from shared mem to global mem
 	if (threadIdx.x == 0) {
-		for (i=0; i<(n*n); i++) {
+		for (int i=0; i<(n*n); i++) {
 			d_board[i].value = s_board[i].value;
 			d_board[i].isLocked = s_board[i].isLocked;
 	
 			if (s_board[i].isLocked!=-1) {
 		
-				for (j=0; j<n; j++) {
+				for (int j=0; j<n; j++) {
 					d_board[i].possValues[j] = s_board[i].possValues[j];
 				}
 			}
