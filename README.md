@@ -24,7 +24,7 @@ Milestones
 
 - [x] I/O and Psuedocode.
 
-- [ ] Code kernels for implementations discussed.
+- [x] Code kernels for implementations discussed.
 
 - [ ] Compare and report results.
 
