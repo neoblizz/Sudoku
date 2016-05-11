@@ -17,7 +17,8 @@
 
 using namespace std;
 
-void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, int n) {
+void HumanLogic (Square * h_unsolved, Square * d_unsolved,
+								 Square * d_solved, int n) {
 
 	// TODO: memcpy
 	// TODO: set grid/TPB
@@ -34,7 +35,7 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 	int threadsPerBlock = n*n;
 	int blocksPerGrid = (n + threadsPerBlock -1) / threadsPerBlock;
 //	int blocksPerGrid = 1;
-	
+
 	 	 int* d_points;
 		  ERROR_CHECK( cudaMalloc((void**) &d_points, sizeof(int)) );
 
@@ -56,7 +57,7 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 //	  int* d_points;
 //	  ERROR_CHECK( cudaMalloc((void**) &d_points, sizeof(int)) );
 
-	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n, d_points);		
+	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n, d_points);
 
 	ERROR_CHECK( cudaPeekAtLastError() );
 	ERROR_CHECK( cudaDeviceSynchronize() );
@@ -65,13 +66,13 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 		ERROR_CHECK( cudaMemcpy(h_points, d_points, sizeof(int),
 			cudaMemcpyDeviceToHost));
 
-	printf("Amount of work done this round is %d.\n", *h_points);  
+	printf("Amount of work done this round is %d.\n", *h_points);
 //}
-	
-	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
-		cudaMemcpyDeviceToHost) );  
 
- 
+	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
+		cudaMemcpyDeviceToHost) );
+
+
      const char * finished = "/********** Angela's (C) **********/";
     output(finished, "-alg", n, false, h_unsolved);
 
@@ -89,7 +90,7 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 //	  int* d_points;
 //	  ERROR_CHECK( cudaMalloc((void**) &d_points, sizeof(int)) );
 
-	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n, d_points);		
+	human<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved, n, d_points);
 
 	ERROR_CHECK( cudaPeekAtLastError() );
 	ERROR_CHECK( cudaDeviceSynchronize() );
@@ -98,10 +99,10 @@ void AngelaKernels( Square* h_unsolved, Square* d_unsolved, Square* d_solved, in
 		ERROR_CHECK( cudaMemcpy(h_points, d_points, sizeof(int),
 			cudaMemcpyDeviceToHost));
 
-	printf("Amount of work done this round is %d.\n", *h_points);  
-	
+	printf("Amount of work done this round is %d.\n", *h_points);
+
 	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
-		cudaMemcpyDeviceToHost) );  
+		cudaMemcpyDeviceToHost) );
 
 //    const char * finished = "/********** Angela's (C) **********/";
     output(finished, "-bee", n, false, h_unsolved);

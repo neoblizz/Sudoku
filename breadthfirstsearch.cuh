@@ -13,7 +13,8 @@
 
 using namespace std;
 
-void bfsKernel( Square* h_unsolved, Square* d_unsolved, Square* d_solved, int n) {
+void BreadthFirstSearch (Square * h_unsolved, Square * d_unsolved,
+												 Square * d_solved, int n) {
 
 	// TODO: memcpy
 	// TODO: set grid/TPB
