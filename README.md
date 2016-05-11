@@ -30,6 +30,18 @@ Milestones
 
 - [ ] Develop a real-time graphical interface for algorithm visualization.
 
+Known Issues
+==========
+- Tree based algorithm is inconclusive as it goes out of memory. Switch techniques from bfs to dfs when tree gets wide.
+- Human-logic kernel functions for first few iterations, needs to be debugged.
+- Bee Colony determines correct result, needs to be optimized to generate possible solutions per block.
+
+Developers
+==========
+- Angela Tobin *(University of California, Davis)*
+- Chenshan Yuan *(University of California, Davis)*
+- Muhammad Osama *(University of California, Davis)*
+
 References
 ==========
 [1] Yuji Sato, Naohiro Hasegawa, and Mikiko Sato. “Acceleration of Genetic Algorithms for Acceleration of Genetic Algorithms for Sudoku Solution on Many-core Processors”<br>
