@@ -1,4 +1,4 @@
-Sudoku Solver -- GPU Implementation [PPT](https://github.com/neoblizz/Sudoku/blob/master/Sudoku%20Solver%20-%20Presentation.pdf)
+Sudoku Solver -- GPU Implementation [[PPT](https://github.com/neoblizz/Sudoku/blob/master/docs/Sudoku%20Solver%20-%20Presentation.pdf)]
 ===================================
 Sudoku is a logic-based number puzzle with the objective of filling an entire 9x9 grid with digits from 1-9 so that each column, row, and 3x3 block has all the numbers once and only once. Since there are 6.67 * 10^21 possible valid solutions for a 9x9 Sudoku puzzle, it becomes an interesting problem to solve on GPUs because of their mass compute ability. The intuitive way to solve sudokus is to use a brute-force search to find solutions. However, any brute-force implementation will be significantly bound by memory constraints on GPUs, and a pure brute-force algorithm would yield very poor performance. To explore the compute ability in solving sudoku problems, it’s interesting to look at other algorithms that efficiently utilize compute ability of GPUs.
 
