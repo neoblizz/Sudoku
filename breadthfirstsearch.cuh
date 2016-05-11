@@ -2,14 +2,6 @@
 #define BFSK_H
 
 
-// TODO: Do I need #ifndef for headers here? or just in kernel files ok?
-
-
-// this file will call populate.cu and human.cu
-
-
-
-
 #include <math.h>
 
 #include "util/error_utils.cuh"
