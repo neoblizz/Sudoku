@@ -26,8 +26,36 @@
 
 // includes, kernels
 #include "beecolony.cuh"
-#include "AngelaKernels.cuh"
-#include "bfsKernel.cuh"
+#include "humanlogic.cuh"
+#include "breadthfirstsearch.cuh"
+
+void print (int n, Square * h_solved, const char * alg, float elapsedTime) {
+
+  if (!strcmp(alg, "-bee")) {
+    CSRtoCSC(h_solved, n);
+    const char * finished = "/********** Bee Colony (C) **********/";
+    output(finished, alg, n, false, h_solved);
+  } else if (!strcmp(alg, "-log")) {
+    const char * finished = "/********** Human-Logic(C) **********/";
+    output(finished, alg, n, false, h_solved);
+  } else if (!strcmp(alg, "-bfs")) {
+    const char * finished = "/************ BFS-DFS (C) ***********/";
+    output(finished, alg, n, false, h_solved);
+  }
+
+  const char* statistics = "/******* Statistics (Begin) ********/";
+  printf("%s\n", statistics);
+  printf("Elapsed Time: %f (ms)\n", elapsedTime);
+  const char* statistics_end = "/******** Statistics (End) *********/";
+  printf("%s\n", statistics_end);
+}
+
+void release (Square * h_unsolved, Square * d_unsolved, Square * d_solved) {
+  /* Free Memory Allocations */
+  free(h_unsolved);
+  ERROR_CHECK( cudaFree(d_unsolved) );
+  ERROR_CHECK( cudaFree(d_solved) );
+}
 
 void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
 
@@ -50,6 +78,7 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   Square * d_solved;
   ERROR_CHECK( cudaMalloc((void**) &d_solved, memsize) );
 
+  /* ARTIFICIAL BEE COLONY ALGORITHM */
   float elapsedTime;
   cudaEventRecord(start, 0);
   ArtificialBeeColony (h_unsolved, d_unsolved, d_solved, n);
@@ -62,29 +91,44 @@ void KernelManager(int n, Square * h_unsolved, bool o_graphics) {
   ERROR_CHECK( cudaMemcpy(h_solved, d_solved, memsize,
                           cudaMemcpyDeviceToHost) );
 
+  const char * bee = "-bee";
+  print(n, h_solved, bee, elapsedTime);
+
+  /* HUMAN LOGIC BASED ALGORITHM */
+  cudaEventRecord(start, 0);
+  HumanLogic (h_unsolved, d_unsolved, d_solved, n);
+
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  cudaEventElapsedTime(&elapsedTime, start, stop);
+
+  ERROR_CHECK( cudaMemcpy(h_solved, d_solved, memsize,
+                          cudaMemcpyDeviceToHost) );
+
+  const char * logic = "-log";
+  print(n, h_solved, logic, elapsedTime);
+
+  /* TREE BASED ALGORITHM */
+  cudaEventRecord(start, 0);
+  BreadthFirstSearch (h_unsolved, d_unsolved, d_solved, n);
+
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  cudaEventElapsedTime(&elapsedTime, start, stop);
+
+  ERROR_CHECK( cudaMemcpy(h_solved, d_solved, memsize,
+                          cudaMemcpyDeviceToHost) );
+
+  const char * tree = "-bfs";
+  print(n, h_solved, tree, elapsedTime);
+
   /* Destroy CUDA event */
   cudaEventDestroy(start);
   cudaEventDestroy(stop);
 
-  // TODO: Terminal Output will go here.
-  const char * alg = "-bee";
+  /* Free Memory */
+  release(h_unsolved, d_unsolved, d_solved);
 
-  if (!strcmp(alg, "-bee")) {
-    CSRtoCSC(h_solved, n);
-    const char * finished = "/********** Bee Colony (C) **********/";
-    output(finished, alg, n, false, h_solved);
-  }
-
-  const char* statistics = "/******* Statistics (Begin) ********/";
-  printf("%s\n", statistics);
-  printf("Elapsed Time: %f (ms)\n", elapsedTime);
-  const char* statistics_end = "/******** Statistics (End) *********/";
-  printf("%s\n", statistics_end);
-
-  /* Free Memory Allocations */
-  free(h_unsolved);
-  ERROR_CHECK( cudaFree(d_unsolved) );
-  ERROR_CHECK( cudaFree(d_solved) );
 }
 
 int main(int argc, char** argv) {
