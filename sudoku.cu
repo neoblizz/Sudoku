@@ -30,9 +30,11 @@
 #include "breadthfirstsearch.cuh"
 
 void print (int n, Square * h_solved, const char * alg, float elapsedTime) {
+  /* Convert to proper format for display */
+  CSRtoCSC(h_solved, n);
 
+  /* Helper string per algorithm */
   if (!strcmp(alg, "-bee")) {
-    CSRtoCSC(h_solved, n);
     const char * finished = "/********** Bee Colony (C) **********/";
     output(finished, alg, n, false, h_solved);
   } else if (!strcmp(alg, "-log")) {
@@ -43,6 +45,7 @@ void print (int n, Square * h_solved, const char * alg, float elapsedTime) {
     output(finished, alg, n, false, h_solved);
   }
 
+  /* Print algorithm statistics */
   const char* statistics = "/******* Statistics (Begin) ********/";
   printf("%s\n", statistics);
   printf("Elapsed Time: %f (ms)\n", elapsedTime);
