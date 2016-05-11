@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "device_function.cu"
+#include "util/device_utils.cuh"
 
 // Populates the possValues array
 // Removes all values that are not possible, based on starting board
@@ -161,14 +161,14 @@ __global__ void populate(Square* board) {
 		int rowVal, colVal, blockVal;
 		for (int i=0; i<9; i++) {
 			//cur = s_board[tid].possValues[i];
-		
+
 			rowVal = localRowValues[i];
 			colVal = localColValues[i];
-			blockVal = localBlockValues[i];	
+			blockVal = localBlockValues[i];
 
 			if (rowVal>=1 && rowVal<=9)
 				s_board[tid].possValues[rowVal-1] = 0;
-	
+
 //			if (colVal != 0)
 			if (colVal>=1 && colVal<=9)
 				s_board[tid].possValues[colVal-1] = 0;
@@ -190,7 +190,7 @@ __global__ void populate(Square* board) {
 				//array of possValues
 				popoff(i, s_board[i].possValues);
 */
-		
+
 
 		}
 	}

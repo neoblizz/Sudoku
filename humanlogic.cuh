@@ -66,15 +66,15 @@ void HumanLogic (Square * h_unsolved, Square * d_unsolved,
 		ERROR_CHECK( cudaMemcpy(h_points, d_points, sizeof(int),
 			cudaMemcpyDeviceToHost));
 
-	printf("Amount of work done this round is %d.\n", *h_points);
+	// printf("Amount of work done this round is %d.\n", *h_points);
 //}
 
 	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
 		cudaMemcpyDeviceToHost) );
 
 
-     const char * finished = "/********** Angela's (C) **********/";
-    output(finished, "-alg", n, false, h_unsolved);
+    // const char * finished = "/********** Angela's (C) **********/";
+    //output(finished, "-alg", n, false, h_unsolved);
 
 //round 2
 	populate<<<blocksPerGrid, threadsPerBlock>>>(d_unsolved);
@@ -99,13 +99,13 @@ void HumanLogic (Square * h_unsolved, Square * d_unsolved,
 		ERROR_CHECK( cudaMemcpy(h_points, d_points, sizeof(int),
 			cudaMemcpyDeviceToHost));
 
-	printf("Amount of work done this round is %d.\n", *h_points);
+	//printf("Amount of work done this round is %d.\n", *h_points);
 
 	ERROR_CHECK( cudaMemcpy(h_unsolved, d_unsolved, memsize,
 		cudaMemcpyDeviceToHost) );
 
 //    const char * finished = "/********** Angela's (C) **********/";
-    output(finished, "-bee", n, false, h_unsolved);
+    //output(finished, "-bee", n, false, h_unsolved);
 
 
 }

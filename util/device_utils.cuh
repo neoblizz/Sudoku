@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "data.cuh"
+#include "../data.cuh"
 
 
 //checks newNum against the other values in the respective row/col/block
@@ -60,7 +60,7 @@ void popoff(vPossible num, vPossible *possibleNum){
 			//first, check if no more possible values (even though not 9 elements)
 			if(possibleNum[i] == '\0'){ //the end of possible num array
 				break;
-		
+
 			}
 
 			//if array was previously 9 elements, the last element should now be \0
